@@ -38,7 +38,9 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.videolan.medialibrary.interfaces.Medialibrary
 import org.videolan.medialibrary.interfaces.media.MediaWrapper
 import org.videolan.medialibrary.interfaces.media.Playlist
@@ -61,6 +63,7 @@ import org.videolan.vlc.gui.dialogs.RENAME_DIALOG_MEDIA
 import org.videolan.vlc.gui.dialogs.RENAME_DIALOG_NEW_NAME
 import org.videolan.vlc.gui.dialogs.RenameDialog
 import org.videolan.vlc.gui.helpers.DefaultPlaybackActionMediaType
+import org.videolan.vlc.gui.helpers.UiTools
 import org.videolan.vlc.gui.helpers.INavigator
 import org.videolan.vlc.gui.video.VideoBrowserFragment
 import org.videolan.vlc.gui.view.EmptyLoadingState
@@ -73,10 +76,14 @@ import org.videolan.vlc.reloadLibrary
 import org.videolan.vlc.util.ContextOption
 import org.videolan.vlc.util.ContextOption.CTX_PLAY_ALL
 import org.videolan.vlc.util.ContextOption.CTX_RENAME
+import org.videolan.vlc.util.ContextOption.CTX_EXPORT
 import org.videolan.vlc.util.getScreenWidth
 import org.videolan.vlc.util.onAnyChange
 import org.videolan.vlc.viewmodels.mobile.PlaylistsViewModel
 import org.videolan.vlc.viewmodels.mobile.getViewModel
+import org.videolan.resources.AndroidDevices
+import java.io.File
+import java.io.FileOutputStream
 import kotlin.math.min
 
 class PlaylistFragment : BaseAudioBrowser<PlaylistsViewModel>(), SwipeRefreshLayout.OnRefreshListener {
@@ -274,10 +281,32 @@ class PlaylistFragment : BaseAudioBrowser<PlaylistsViewModel>(), SwipeRefreshLay
                 val dialog = RenameDialog.newInstance(media)
                 dialog.show(requireActivity().supportFragmentManager, RenameDialog::class.simpleName)
             }
+            CTX_EXPORT -> {
+                val playlist = getCurrentAdapter()?.getItem(position) as? Playlist ?: return
+                exportPlaylist(playlist)
+            }
             else -> super.onCtxAction(position, option)
         }
 
 
+    }
+
+    private fun exportPlaylist(playlist: Playlist) = lifecycleScope.launch(Dispatchers.IO) {
+        val tracks = playlist.tracks
+        val builder = StringBuilder("#EXTM3U\n")
+        tracks.forEach { builder.append(it.uri.toString()).append('\n') }
+        val name = playlist.title.replace(Regex("[\\\\/:*?\"<>|]"), "_")
+        val file = File(AndroidDevices.MediaFolders.EXTERNAL_PUBLIC_DOWNLOAD_DIRECTORY_FILE, "$name.m3u")
+        try {
+            FileOutputStream(file).use { it.write(builder.toString().toByteArray()) }
+            withContext(Dispatchers.Main) {
+                UiTools.snacker(requireActivity(), getString(R.string.playlist_exported, file.absolutePath))
+            }
+        } catch (e: Exception) {
+            withContext(Dispatchers.Main) {
+                UiTools.snacker(requireActivity(), R.string.playlist_export_failed)
+            }
+        }
     }
 
     override fun onRefresh() {
