@@ -107,6 +107,7 @@ import org.videolan.vlc.util.ContextOption.CTX_PLAY_SHUFFLE
 import org.videolan.vlc.util.ContextOption.CTX_RENAME
 import org.videolan.vlc.util.ContextOption.CTX_SET_RINGTONE
 import org.videolan.vlc.util.ContextOption.CTX_SHARE
+import org.videolan.vlc.util.ContextOption.CTX_EXPORT
 import org.videolan.vlc.util.ContextOption.Companion.createCtxAudioFlags
 import org.videolan.vlc.util.ContextOption.Companion.createCtxPlaylistAlbumFlags
 import org.videolan.vlc.util.ContextOption.Companion.createCtxTrackFlags
@@ -482,6 +483,7 @@ abstract class BaseAudioBrowser<T : MedialibraryViewModel> : MediaBrowserFragmen
                     add(CTX_PLAY_AS_AUDIO)
                     if (item.tracksCount > 2) add(CTX_PLAY_SHUFFLE)
                     if (item.isFavorite) add(CTX_FAV_REMOVE) else add(CTX_FAV_ADD)
+                    add(CTX_EXPORT)
                 }
             }
             else -> createCtxAudioFlags()

@@ -668,6 +668,9 @@
     <string name="search_global">Search in all media library</string>
     <string name="playlist_save">Save Playlist</string>
     <string name="playlist_name_hint">Playlist name</string>
+    <string name="export_playlist">Export playlist</string>
+    <string name="playlist_exported">Playlist exported to %1$s</string>
+    <string name="playlist_export_failed">Failed to export playlist</string>
     <string name="chapters">Chapters</string>
     <string name="notset">Not set</string>
     <string name="go_to_chapter">Go to chapter…</string>

@@ -628,6 +628,9 @@
     <string name="search_global">Suche in allen Medienbibliotheken</string>
     <string name="playlist_save">Wiedergabeliste speichern</string>
     <string name="playlist_name_hint">Name der Wiedergabeliste</string>
+    <string name="export_playlist">Wiedergabeliste exportieren</string>
+    <string name="playlist_exported">Wiedergabeliste nach %1$s exportiert</string>
+    <string name="playlist_export_failed">Wiedergabeliste konnte nicht exportiert werden</string>
     <string name="chapters">Kapitel</string>
     <string name="notset">Nicht festgelegt</string>
     <string name="go_to_chapter">Wechsle zum Kapitel…</string>
